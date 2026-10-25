@@ -231,54 +231,75 @@ img, video {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding-block: 0.9rem;
+  gap: 0.65rem;
+  padding-block: 0.8rem;
 }
 
 .brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: clamp(0.98rem, 0.85rem + 0.5vw, 1.15rem);
   letter-spacing: -0.02em;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .brand-logo {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.65rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.6rem;
   box-shadow: 0 4px 12px rgba(17, 45, 70, 0.25);
   aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .brand-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 .brand-badge {
-  font-size: 0.7rem;
+  display: none;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: var(--brand-accent-soft);
   color: var(--brand-accent);
   border: 1px solid currentColor;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 .nav-links {
   display: none;
   align-items: center;
-  gap: 1.75rem;
+  gap: 1.35rem;
   list-style: none;
-  font-size: 0.925rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .nav-links a:hover {
   color: var(--brand-accent);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1080px) {
   .nav-links {
     display: flex;
   }
@@ -287,21 +308,45 @@ img, video {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.nav-actions .btn-primary {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.82rem;
+}
+
+@media (min-width: 640px) {
+  .nav-actions {
+    gap: 0.65rem;
+  }
+  .nav-actions .btn-primary {
+    padding: 0.65rem 1.2rem;
+    font-size: 0.925rem;
+  }
 }
 
 .theme-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 999px;
   border: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
   color: var(--text-secondary);
   cursor: pointer;
+  flex-shrink: 0;
   transition: border-color 0.2s, transform 0.2s, color 0.2s;
+}
+
+@media (min-width: 640px) {
+  .theme-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 .theme-toggle:hover {

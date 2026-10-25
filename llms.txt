@@ -1,9 +1,9 @@
 # Notebook Studio: PDF Designer
 
-> Design bespoke hyperlinked PDF planners for your e-Ink tablet and iPad — on iPhone, iPad, and Mac. £9.99 one-time purchase on the Apple App Store with no subscription, no account required, and zero tracking.
+> Design bespoke hyperlinked PDF planners for your e-Ink tablet and iPad — on iPhone, iPad, and Mac. $6.99 one-time purchase on the Apple App Store with no subscription, no account required, and zero tracking.
 
 ## Summary
-Notebook Studio: PDF Designer is a native iOS, iPadOS, and macOS application (App Store ID `6811397092`) created by Sam Proctor. It solves the #1 pain of e-ink tablet owners—blurry, misaligned generic PDF templates where tabs get hidden behind system toolbars—by compiling crisp vector PDFs calibrated 1:1 to exact physical millimeter spacing and device screen dimensions.
+Notebook Studio: PDF Designer is a native iOS, iPadOS, and macOS application (App Store ID `6811397092`) for iOS, iPadOS, and macOS. It solves the #1 pain of e-ink tablet owners—blurry, misaligned generic PDF templates where tabs get hidden behind system toolbars—by compiling crisp vector PDFs calibrated 1:1 to exact physical millimeter spacing and device screen dimensions.
 
 ## Supported Target Devices
 - reMarkable Paper Pro (11.8", 1620 × 2160 px, 229 PPI) & reMarkable Paper Pro Move (7.3", 954 × 1696 px, 264 PPI)
@@ -18,7 +18,7 @@ Notebook Studio: PDF Designer is a native iOS, iPadOS, and macOS application (Ap
 - **1:1 Physical Millimeter Scale Simulator**: Preview real-world line spacing (e.g., 5mm dot grid, 6.5mm ruled lines) and e-ink contrast before exporting.
 - **22+ Dynamic Date & Quote Tags**: Tags like `<day_full>`, `<week_range>`, `<day_of_year>`, and `<quote:topic=mindfulness>` auto-populate 365+ pages during compilation.
 - **Automated Link Audit**: Verifies every tab, calendar cell, and Table of Contents jump before exporting a crisp vector PDF.
-- **Pricing**: £9.99 one-time purchase on the Apple App Store (`https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092`). No subscriptions, no in-app purchases, includes Apple Family Sharing.
+- **Pricing**: $6.99 one-time purchase on the Apple App Store (`https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092`). No subscriptions, no in-app purchases, includes Apple Family Sharing.
 
 ## Key Links
 - Homepage: https://samjproctor.github.io/notebook-studio-website/
