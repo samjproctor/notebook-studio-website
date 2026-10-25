@@ -14,6 +14,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <script type="module">
+    import { analytics } from 'https://esm.sh/@heycatch/sdk@0.8.3';
+
+    analytics.init({
+      projectKey: 'hck_pk_Mr3rc7qC2evDjixgxFK5U9Qc_7A5M3E7',
+      requestBatching: false,
+      install: {
+        framework: 'web',
+        agent: 'other',
+      },
+    });
+  </script>
 </head>
 <body>
   <header class="site-header">
