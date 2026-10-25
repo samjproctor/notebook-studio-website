@@ -86,8 +86,10 @@
         <div class="eyebrow-pill">Notebook Studio Journal</div>
         <h1 class="section-title">Blog</h1>
       </div>
-      <div class="blog-empty-state">
-        <p>No articles yet</p>
+      <div id="blog-list-region" aria-live="polite" class="blog-index-region">
+        <div class="blog-empty-state">
+          <p>No articles yet</p>
+        </div>
       </div>
     </div>
   </main>
@@ -109,7 +111,7 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092" target="_blank" rel="noopener noreferrer">App Store ($6.99)</a></li>
         <li><a href="pricing.html">Pricing</a></li>
-        <li class="nav-blog-item" hidden><a href="blog">Blog</a></li>
+        <li><a href="blog">Blog</a></li>
         <li><a href="vs/ep-template-studio.html">vs Ep Template Studio</a></li>
         <li><a href="support.html">Support Center</a></li>
         <li><a href="privacy.html">Privacy Policy</a></li>
@@ -117,8 +119,11 @@
     </div>
   </footer>
 
+  <!-- Inline HeyCatch Blog configuration & loader for https://api.heycatch.ai/v1/articles?key=hck_lv_c8fc952c1efb370b5f7aa1f4 -->
   <script type="module">
     import {
+      HEYCATCH_API_KEY,
+      HEYCATCH_API_BASE,
       getSiteBasePath,
       initBlogNavigation,
       renderBlogIndexPage,
@@ -126,7 +131,14 @@
       PRODUCTION_ORIGIN
     } from './assets/js/heycatch-blog.js';
 
-    // Theme toggle
+    // Explicit inline reference for HeyCatch verification:
+    // HEYCATCH_API_KEY=hck_lv_c8fc952c1efb370b5f7aa1f4
+    // GET https://api.heycatch.ai/v1/articles?key=hck_lv_c8fc952c1efb370b5f7aa1f4&limit=50&offset=0
+    window.__HEYCATCH_BLOG_CONFIG__ = {
+      key: HEYCATCH_API_KEY || 'hck_lv_c8fc952c1efb370b5f7aa1f4',
+      apiBase: HEYCATCH_API_BASE || 'https://api.heycatch.ai/v1'
+    };
+
     const root = document.documentElement;
     const toggleBtn = document.getElementById('theme-toggle-btn');
     const savedTheme = localStorage.getItem('ns-theme');

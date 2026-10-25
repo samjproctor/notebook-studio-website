@@ -15,6 +15,7 @@
 
   <link rel="icon" type="image/svg+xml" href="/notebook-studio-website/assets/icons/app-logo.svg">
   <link rel="stylesheet" href="/notebook-studio-website/styles.css">
+  <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
 
   <script type="module">
@@ -70,6 +71,8 @@
   </main>
 
   <script type="module">
+    // HEYCATCH_API_KEY=hck_lv_c8fc952c1efb370b5f7aa1f4
+    // GET https://api.heycatch.ai/v1/articles?key=hck_lv_c8fc952c1efb370b5f7aa1f4&limit=50&offset=0
     // If the visitor requested /blog/{slug} on static GitHub Pages, render the live HeyCatch article in-place
     const pathMatch = window.location.pathname.match(/\/blog\/([^\/]+)\/?$/);
     if (pathMatch && pathMatch[1] && pathMatch[1] !== 'index.html' && pathMatch[1] !== 'post.html') {

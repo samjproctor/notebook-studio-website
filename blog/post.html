@@ -110,13 +110,21 @@
     </div>
   </footer>
 
+  <!-- Inline HeyCatch Blog configuration & loader for https://api.heycatch.ai/v1/articles?key=hck_lv_c8fc952c1efb370b5f7aa1f4 -->
   <script type="module">
     import {
+      HEYCATCH_API_KEY,
+      HEYCATCH_API_BASE,
       getSiteBasePath,
       initBlogNavigation,
       renderBlogArticlePage,
       renderBlogIndexPage
     } from '../assets/js/heycatch-blog.js';
+
+    window.__HEYCATCH_BLOG_CONFIG__ = {
+      key: HEYCATCH_API_KEY || 'hck_lv_c8fc952c1efb370b5f7aa1f4',
+      apiBase: HEYCATCH_API_BASE || 'https://api.heycatch.ai/v1'
+    };
 
     const root = document.documentElement;
     const toggleBtn = document.getElementById('theme-toggle-btn');
