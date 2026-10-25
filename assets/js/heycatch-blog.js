@@ -11,7 +11,7 @@
 
 export const HEYCATCH_API_KEY = 'hck_lv_c8fc952c1efb370b5f7aa1f4';
 export const HEYCATCH_API_BASE = 'https://api.heycatch.ai/v1';
-export const PRODUCTION_ORIGIN = 'https://samjproctor.github.io/notebook-studio-website';
+export const PRODUCTION_ORIGIN = 'https://samjproctor.github.io';
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds (within the 60-300s revalidation window)
 
 export function getSiteBasePath() {
