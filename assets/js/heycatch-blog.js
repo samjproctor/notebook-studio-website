@@ -372,6 +372,7 @@ export function updateArticleHeadMeta(article) {
     el.setAttribute('content', contentValue);
   }
 
+  setMeta('meta[name="robots"]', 'name', 'robots', 'index, follow');
   setMeta('meta[name="description"]', 'name', 'description', metaDesc);
   setMeta('meta[property="og:title"]', 'property', 'og:title', title);
   setMeta('meta[property="og:description"]', 'property', 'og:description', metaDesc);

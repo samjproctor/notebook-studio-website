@@ -156,6 +156,9 @@ function buildArticlePageHtml(article) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="index, follow">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>${title}</title>
   <meta name="description" content="${metaDesc}">
   <link rel="canonical" href="${canonicalUrl}">
@@ -166,7 +169,23 @@ function buildArticlePageHtml(article) {
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${metaDesc}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:description" content="${metaDesc}">${jsonLdScript}
+  <meta name="twitter:description" content="${metaDesc}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "notebook-studio.com",
+    "alternateName": "Notebook Studio",
+    "url": "https://www.notebook-studio.com",
+    "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
+    "email": "support@notebook-studio.com",
+    "sameAs": [
+      "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
+      "https://samjproctor.github.io/notebook-studio-website/",
+      "https://www.notebook-studio.com"
+    ]
+  }
+  </script>${jsonLdScript}
 
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/app-logo.svg">
   <link rel="icon" type="image/png" sizes="58x58" href="../../assets/icons/favicon-58.png">
@@ -259,9 +278,9 @@ function buildArticlePageHtml(article) {
           <img src="../../assets/icons/app-logo.svg" alt="Notebook Studio Logo" class="brand-logo" width="32" height="32" loading="lazy">
           <span>Notebook Studio: PDF Designer</span>
         </div>
-        <p>© 2026 Notebook Studio. All rights reserved. • Built for iPhone, iPad &amp; Mac.</p>
+        <p>© 2026 notebook-studio.com (Notebook Studio). All rights reserved. • Built for iPhone, iPad &amp; Mac.</p>
         <p style="margin-top: 0.25rem;">
-          $6.99 one-time purchase on the App Store • Support: <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
+          <a href="../../about.html">About notebook-studio.com</a> · <a href="../../contact.html">Contact</a> · <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
         </p>
       </div>
 
@@ -270,6 +289,8 @@ function buildArticlePageHtml(article) {
         <li><a href="https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092" target="_blank" rel="noopener noreferrer">App Store ($6.99)</a></li>
         <li><a href="../../pricing.html">Pricing</a></li>
         <li><a href="../../blog">Blog</a></li>
+        <li><a href="../../about.html">About notebook-studio.com</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
         <li><a href="../../vs/ep-template-studio.html">vs Ep Template Studio</a></li>
         <li><a href="../../support.html">Support Center</a></li>
         <li><a href="../../privacy.html">Privacy Policy</a></li>
@@ -384,7 +405,73 @@ async function main() {
     console.log(`Generated static route for /blog/${slug}`);
   }
 
-  // 3. Update sitemap.xml with /blog and every /blog/{slug} with <lastmod> from updated
+  // 3. Ensure shared SEO head & footer markup across all public HTML pages
+  const sharedOrgJsonLd = `  <script type="application/ld+json" id="shared-org-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "notebook-studio.com",
+    "alternateName": "Notebook Studio",
+    "url": "https://www.notebook-studio.com",
+    "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
+    "email": "support@notebook-studio.com",
+    "sameAs": [
+      "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
+      "https://samjproctor.github.io/notebook-studio-website/",
+      "https://www.notebook-studio.com"
+    ]
+  }
+  </script>`;
+
+  const pagesToPatch = [
+    ['pricing.html', ''],
+    ['pricing/index.html', '../'],
+    ['support.html', ''],
+    ['privacy.html', ''],
+    ['remarkable-planner-designer.html', ''],
+    ['kindle-scribe-planner-designer.html', ''],
+    ['vs/ep-template-studio.html', '../'],
+    ['vs/ep-template-studio/index.html', '../../'],
+    ['blog/index.html', '../'],
+    ['blog.html', ''],
+    ['blog/post.html', '../']
+  ];
+
+  for (const [relFile, prefix] of pagesToPatch) {
+    const filePath = path.join(rootDir, relFile);
+    try {
+      let html = await fs.readFile(filePath, 'utf8');
+      if (!html.includes('name="robots"')) {
+        html = html.replace(
+          /<meta name="color-scheme" content="light dark">/,
+          `<meta name="color-scheme" content="light dark">\n  <meta name="robots" content="index, follow">\n  <meta http-equiv="X-Content-Type-Options" content="nosniff">\n  <meta name="referrer" content="strict-origin-when-cross-origin">`
+        );
+      }
+      if (!html.includes('"@type": "Organization"')) {
+        html = html.replace('</head>', `${sharedOrgJsonLd}\n</head>`);
+      }
+      if (!html.includes('About notebook-studio.com')) {
+        html = html.replace(
+          /<li><a href="([^"]*privacy\.html)">Privacy Policy<\/a><\/li>/,
+          `<li><a href="${prefix}about.html">About notebook-studio.com</a></li>\n        <li><a href="${prefix}contact.html">Contact</a></li>\n        <li><a href="$1">Privacy Policy</a></li>`
+        );
+      }
+      await fs.writeFile(filePath, html, 'utf8');
+    } catch {
+      // Ignore missing optional file
+    }
+  }
+
+  // 4. Update sitemap.xml with honest lastmod timestamps from file stats & article updated dates
+  async function getFileDate(relFile) {
+    try {
+      const st = await fs.stat(path.join(rootDir, relFile));
+      return st.mtime.toISOString().slice(0, 10);
+    } catch {
+      return '2026-10-25';
+    }
+  }
+
   const sitemapPath = path.join(rootDir, 'sitemap.xml');
   const articleEntries = articles
     .map((a) => {
@@ -401,19 +488,19 @@ async function main() {
 
   const latestBlogMod = articles.length > 0
     ? (articles[0].updated || articles[0].published || '2026-10-25').slice(0, 10)
-    : '2026-10-25';
+    : await getFileDate('blog/index.html');
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${PRODUCTION_ORIGIN}/</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('index.html')}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>${PRODUCTION_ORIGIN}/pricing.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('pricing.html')}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -424,32 +511,44 @@ async function main() {
     <priority>0.9</priority>
   </url>
 ${articleEntries ? `${articleEntries}\n` : ''}  <url>
+    <loc>${PRODUCTION_ORIGIN}/about.html</loc>
+    <lastmod>${await getFileDate('about.html')}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${PRODUCTION_ORIGIN}/contact.html</loc>
+    <lastmod>${await getFileDate('contact.html')}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>${PRODUCTION_ORIGIN}/vs/ep-template-studio.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('vs/ep-template-studio.html')}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_ORIGIN}/remarkable-planner-designer.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('remarkable-planner-designer.html')}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_ORIGIN}/kindle-scribe-planner-designer.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('kindle-scribe-planner-designer.html')}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_ORIGIN}/support.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('support.html')}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_ORIGIN}/privacy.html</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>${await getFileDate('privacy.html')}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -457,6 +556,31 @@ ${articleEntries ? `${articleEntries}\n` : ''}  <url>
 `;
   await fs.writeFile(sitemapPath, sitemapXml, 'utf8');
   console.log('Updated sitemap.xml');
+
+  // 5. Ping IndexNow (t_sitemap_fresh)
+  try {
+    const indexNowKey = '8f4b2e9c1a7d4e6f8b3c5a2d9e1f0a3b';
+    const urlList = [
+      `${PRODUCTION_ORIGIN}/`,
+      `${PRODUCTION_ORIGIN}/blog`,
+      `${PRODUCTION_ORIGIN}/about.html`,
+      `${PRODUCTION_ORIGIN}/contact.html`,
+      ...articles.map((a) => `${PRODUCTION_ORIGIN}/blog/${encodeURIComponent(a.slug || a.id || '')}`)
+    ];
+    await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'samjproctor.github.io',
+        key: indexNowKey,
+        keyLocation: `${PRODUCTION_ORIGIN}/${indexNowKey}.txt`,
+        urlList
+      })
+    });
+    console.log('Pinged IndexNow');
+  } catch {
+    // Non-fatal
+  }
 }
 
 main().catch((err) => {

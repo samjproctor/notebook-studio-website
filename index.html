@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Mandatory: Declare support for both light and dark themes before rendering -->
   <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="index, follow">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Notebook Studio — Hyperlinked e-Ink &amp; iPad PDF Planners</title>
   <meta name="description" content="Generic templates look blurry and misaligned on e-ink screens. Design bespoke hyperlinked vector PDF planners calibrated 1:1 on iPhone, iPad &amp; Mac for reMarkable, Kindle Scribe, Supernote &amp; BOOX. $6.99 one-time purchase.">
   <link rel="canonical" href="https://samjproctor.github.io/notebook-studio-website/">
@@ -32,7 +35,29 @@
 
   <link rel="stylesheet" href="styles.css">
 
-  <!-- JSON-LD Structured Data: Organization, SoftwareApplication (with $6.99 Offer), and FAQPage -->
+  <!-- JSON-LD Structured Data: Top-level Organization (a_org_schema, a_sameas) + SoftwareApplication & FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "notebook-studio.com",
+    "alternateName": "Notebook Studio",
+    "url": "https://www.notebook-studio.com",
+    "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
+    "email": "support@notebook-studio.com",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "support@notebook-studio.com",
+      "contactType": "customer support",
+      "availableLanguage": "en"
+    },
+    "sameAs": [
+      "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
+      "https://samjproctor.github.io/notebook-studio-website/",
+      "https://www.notebook-studio.com"
+    ]
+  }
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -40,10 +65,15 @@
       {
         "@type": "Organization",
         "@id": "https://samjproctor.github.io/notebook-studio-website/#organization",
-        "name": "Notebook Studio",
-        "url": "https://samjproctor.github.io/notebook-studio-website/",
-        "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-logo.svg",
+        "name": "notebook-studio.com",
+        "url": "https://www.notebook-studio.com",
+        "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
         "email": "support@notebook-studio.com",
+        "sameAs": [
+          "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
+          "https://samjproctor.github.io/notebook-studio-website/",
+          "https://www.notebook-studio.com"
+        ],
         "contactPoint": {
           "@type": "ContactPoint",
           "email": "support@notebook-studio.com",
@@ -1017,9 +1047,9 @@
           <img src="assets/icons/app-logo.svg" alt="Notebook Studio Logo" class="brand-logo" width="32" height="32" loading="lazy">
           <span>Notebook Studio: PDF Designer</span>
         </div>
-        <p>© 2026 Notebook Studio. All rights reserved. • Built for iPhone, iPad &amp; Mac.</p>
+        <p>© 2026 notebook-studio.com (Notebook Studio). All rights reserved. • Built for iPhone, iPad &amp; Mac.</p>
         <p style="margin-top: 0.25rem;">
-          $6.99 one-time purchase on the App Store • Support: <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
+          <a href="about.html">About notebook-studio.com</a> · <a href="contact.html">Contact</a> · <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
         </p>
       </div>
 
@@ -1029,6 +1059,8 @@
         <li><a href="vs/ep-template-studio.html">vs Ep Template Studio</a></li>
         <li><a href="remarkable-planner-designer.html">reMarkable Planners</a></li>
         <li><a href="kindle-scribe-planner-designer.html">Kindle Scribe Planners</a></li>
+        <li><a href="about.html">About notebook-studio.com</a></li>
+        <li><a href="contact.html">Contact</a></li>
         <li><a href="support.html">Support Center</a></li>
         <li><a href="privacy.html">Privacy Policy</a></li>
         <li><a href="blog">Blog</a></li>
