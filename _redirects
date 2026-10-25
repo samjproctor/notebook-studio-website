@@ -1,3 +1,4 @@
+/blog/:slug /blog/post.html 200
 /a /?utm_source=heycatch&utm_campaign=a 302
 /b /?utm_source=heycatch&utm_campaign=b 302
 /c /?utm_source=heycatch&utm_campaign=c 302
