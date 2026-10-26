@@ -9,8 +9,43 @@ import path from 'node:path';
 
 const HEYCATCH_API_KEY = process.env.HEYCATCH_API_KEY || 'hck_lv_c8fc952c1efb370b5f7aa1f4';
 const HEYCATCH_API_BASE = process.env.HEYCATCH_API_BASE || 'https://api.heycatch.ai/v1';
-const PRODUCTION_ORIGIN = 'https://samjproctor.github.io';
+const PRODUCTION_ORIGIN = 'https://notebook-studio.com';
+const OG_IMAGE = `${PRODUCTION_ORIGIN}/assets/marketing/og-card-1200x630.jpg`;
 const RTL_LANGS = new Set(['ar', 'he', 'fa', 'ur']);
+
+const ELENA_PERSON = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Elena Vance",
+  "url": "https://notebook-studio.com/author/elena-vance",
+  "jobTitle": "Senior Digital Stationery Editor at Notebook Studio",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Notebook Studio",
+    "url": "https://notebook-studio.com"
+  },
+  "sameAs": [
+    "https://notebook-studio.com/author/elena-vance",
+    "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092"
+  ]
+};
+
+const MARCUS_PERSON = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Marcus Reed",
+  "url": "https://notebook-studio.com/author/marcus-reed",
+  "jobTitle": "Lead e-Ink Hardware Reviewer at Notebook Studio",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Notebook Studio",
+    "url": "https://notebook-studio.com"
+  },
+  "sameAs": [
+    "https://notebook-studio.com/author/marcus-reed",
+    "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092"
+  ]
+};
 
 function escapeHtml(str) {
   return String(str || '')
@@ -37,20 +72,151 @@ function formatPublishedDate(dateStr) {
   }
 }
 
-/**
- * Sanitise content_html and inject Table of Contents right after Key takeaways list
- * (or at the top of content_html if no Key takeaways), linking to each h2[id] except id="faq".
- */
+export function polishHabitTrackerHtml(html) {
+  const replacements = [
+    [
+      `<p>A habit tracker planner is a hyperlinked PDF planner whose layout is chosen to match the habit you're tracking: binary daily habits get grid checkboxes, frequency-based habits get tally grids, time-of-day habits get vertical columns, and multi-step routines get dedicated rows. This guide maps each layout to each habit type, then walks through building a monthly spread calibrated to your e-ink device's exact PPI.</p>`,
+      `<p>A habit tracker planner is a hyperlinked PDF planner whose layout matches the specific habit you track. Binary daily habits use grid checkboxes, while frequency habits use tally grids and routines use dedicated rows. Every layout in this guide maps to a habit type for a monthly spread calibrated to your e-Ink PPI.</p>`
+    ],
+    [
+      `<p>A habit tracker is a page or spread where you log each time you complete a chosen habit, usually as a filled cell in a grid of days. In a digital planner, it becomes a hyperlinked PDF page sized to your device, so a tap on the monthly tab jumps straight to it on a reMarkable, Supernote, or BOOX screen.</p>`,
+      `<p>A habit tracker is a dedicated spread where you log each completed habit as a filled cell across daily columns. Inside a digital planner, the habit tracker becomes a hyperlinked PDF page sized to your tablet screen. One finger tap on the monthly tab jumps straight to the habit grid on reMarkable, Supernote, or BOOX.</p>`
+    ],
+    [
+      `<p>The point is visibility: seeing 20 filled cells in a row creates a streak you don't want to break. That matters because habits form slowly. A widely cited study found habits took anywhere from 18 to 254 days to become automatic, averaging about 66 days (<a href="https://onlinelibrary.wiley.com/doi/10.1002/ejsp.674">Lally et al., 2010</a>), so a tracker spanning a full monthly spread, repeated across months, matches the actual timeline.</p>`,
+      `<p>Visual streak tracking works because seeing 20 filled cells in a row motivates daily consistency. Long-term visibility matters because new habits form slowly over many weeks. Research by <a href="https://onlinelibrary.wiley.com/doi/10.1002/ejsp.674" rel="noopener noreferrer">Lally et al. (2010)</a> found habits take 18 to 254 days to become automatic, averaging 66 days. A monthly habit spread repeated across linked months matches that 66-day formation timeline.</p>`
+    ],
+    [
+      `<p>A planner tells you what to do; a habit tracker tells you what you actually did. When both live in the same hyperlinked PDF, every planning decision is informed by real logging data instead of memory.</p>`,
+      `<p>A daily schedule planner records what you intend to do, while a habit tracker records what you actually completed. Keeping both tools inside the same hyperlinked PDF grounds every weekly planning decision in real completion data.</p>`
+    ],
+    [
+      `<p>A standalone tracker on one page and a calendar on another forces you to flip between files, and the two drift apart. You plan March in one document while your February streak data sits elsewhere, so your weekly load never adjusts to what you can actually sustain. On e-ink devices like reMarkable or Supernote, switching between documents is slow enough that the friction kills the habit of logging itself.</p>`,
+      `<p>Separate habit tracker and calendar files force you to flip between documents until the two records drift apart. Planning March in one PDF while February streak data sits elsewhere prevents realistic weekly workload adjustments. Document switching on e-Ink tablets like reMarkable or Supernote adds enough lag to break the daily logging habit.</p>`
+    ],
+    [
+      `<p>The loop has three passes through the same spread. Plan: you schedule habits into the month's grid. Log: you fill the tracker cells daily with your pen. Review: at week's end, the filled cells sit next to your calendar entries, showing whether your plan matched your capacity. Miss three gym sessions in a row and the tracker, embedded in the same spread as your weekly layout, makes the mismatch visible immediately. That immediacy is the entire point of combining them.</p>`,
+      `<p>An integrated habit planning loop runs three passes across the same monthly spread. First, you schedule target habits into the monthly grid. Second, you mark completed tracker cells daily with your stylus. Third, you review the filled cells beside your weekly calendar entries every Sunday. Missing three gym sessions on a combined spread reveals the scheduling mismatch immediately.</p>`
+    ],
+    [
+      `<p>A monthly planner with a habit tracker needs four parts: a monthly calendar grid, a habit tracker table sized for your habits, weekly spreads that link back to it, and a review page. On e-ink, everything must be drawn at your device's exact resolution. A reMarkable 2, for example, renders at 1872 × 1404 on a 10.3-inch display (<a href="https://remarkable.com">reMarkable spec page</a>), so a cell under 40 pixels wide becomes mushy when written on.</p>`,
+      `<p>A monthly habit planner requires four connected components: a monthly calendar, a habit table, linked weekly spreads, and a review page. Every grid line on an e-Ink tablet must match the panel's native pixel resolution. The <a href="/remarkable-planner-designer.html">reMarkable 2</a> renders 1872 × 1404 pixels on a 10.3-inch screen (<a href="https://remarkable.com" rel="noopener noreferrer">reMarkable spec page</a>), so cells under 40 pixels wide feel cramped.</p>`
+    ],
+    [
+      `<p>Build the tracker as a matrix: habit rows down the left, days 1–31 across the top. Keep cells at least 45 pixels square so a pen tap or checkmark lands cleanly. Reserve a narrow margin column for totals, and leave the bottom fifth empty for notes.</p>`,
+      `<p>A monthly habit matrix places habit names down the left column and days 1 through 31 across the top row. Sizing each checkbox cell to at least 45 pixels square ensures stylus checkmarks land cleanly. A narrow right column holds monthly totals, while the bottom fifth holds reflection notes.</p>`
+    ],
+    [
+      `<p>End the month with a review page: completion counts per habit, one line for what worked, one for what to drop. Then a rollover page carries unfinished habits and new targets into next month's spread, so your hyperlinked PDF stays one continuous document rather than twelve disconnected files.</p>`,
+      `<p>A monthly review page summarizes completion counts per habit alongside one line for successes and one line for habits to drop. A linked rollover section carries active habits into next month's spread so the hyperlinked PDF remains one continuous notebook.</p>`
+    ],
+    [
+      `<p>Did I do it, yes or no? Binary habits like "stretch" or "no caffeine after 2pm" fit a simple grid: one row per habit, one column per day. Keep rows at least 24pt tall on a 10.3" reMarkable or Supernote, since a pen tap is far less precise than a finger tap. A dot-grid page also works if you prefer freeform placement, but a ruled grid removes the need to eyeball alignment every day.</p>`,
+      `<p>Binary daily habits like stretching or avoiding afternoon caffeine fit a simple row-by-day checkbox grid. Rows on a 10.3-inch reMarkable or Supernote should measure at least 24pt tall for comfortable stylus marking. A ruled vector grid eliminates manual daily alignment compared to a blank dot-grid page.</p>`
+    ],
+    [
+      `<p>Habits like "gym 3x per week" or "read 20 pages" break the binary grid. For a target of X times per week, a chain layout of empty circles you fill in works, because the streak itself is the motivation. For quota habits, use a counter row: one cell per week, subdivided into tally marks. Number the tallies so you can see progress toward the quota without counting.</p>`,
+      `<p>Frequency and quota habits like three weekly gym sessions or reading 20 pages require non-binary layouts. Weekly frequency targets work best with a chain of circles for each target session. Quota habits work best with weekly counter cells subdivided into numbered tally marks.</p>`
+    ],
+    [
+      `<p>Morning/evening routines and multi-step sequences (e.g., a five-step shutdown ritual) need a column per time block or per step, not per day. This turns the tracker into a checklist you re-run daily, which is the layout most people under-build.</p>`,
+      `<p>Morning and evening routines require one column per routine step rather than one column per calendar day. Step-based columns turn the routine tracker into a repeatable daily checklist across the week.</p>`
+    ],
+    [
+      `<p>Any tool you build with, whether Ep Template Studio, Canva, or Notebook Studio, should let you mix these layouts on one spread, since most real planners need at least two.</p>`,
+      `<p>Digital planner design apps like <a href="/vs/ep-template-studio.html">Ep Template Studio</a>, Canva, and <a href="/">Notebook Studio</a> allow mixing multiple tracker tables on one page. Most real-world e-Ink planners combine a binary daily grid with a weekly frequency counter.</p>`
+    ],
+    [
+      `<p>Decide whether each habit is daily, weekly, or X-times-per-week before drawing anything. Cap the list at five to eight habits so rows stay legible on a 10.3" screen.</p>`,
+      `<p>Habit categorization starts by labeling each goal as daily, weekly, or quota-based before drawing the table. Capping the monthly list at five to eight habits keeps every row legible on a 10.3-inch e-Ink screen.</p>`
+    ],
+    [
+      `<p>Match cell counts to your device's actual resolution in points, not pixels. A 31-day row grid works for binary habits; a weekly column layout suits frequency-based ones.</p>`,
+      `<p>Grid dimensioning matches cell counts to your tablet's physical canvas points rather than raw screen pixels. A 31-column grid fits daily binary habits, while a 4-column layout fits weekly frequency goals.</p>`
+    ],
+    [
+      `<p>Build the monthly spread on one artboard, then duplicate it for each month and wire the index tabs, month links, and back-to-index buttons as link hotspots before export. Every vector tool you already own can do this: Figma exports multi-page PDFs and supports link hotspots per its <a href="https://help.figma.com">help documentation</a>, Canva exports PDFs with embedded links, and ToonSquid handles vector PDF export from a drawing-first workflow. Ep Template Studio is purpose-built for this exact job, while Notebook Studio sits between the two: it generates the tracker grid and hyperlinks natively but offers fewer illustration tools than ToonSquid. Whatever you use, export as vector PDF so lines stay crisp at your device's PPI and the file stays small enough for the tablet's native file manager.</p>`,
+      `<p>Master spread duplication wires index tabs, monthly links, and return buttons across all twelve monthly artboards before export. General design tools like Figma (<a href="https://help.figma.com" rel="noopener noreferrer">Figma documentation</a>), Canva, and ToonSquid can export multi-page PDFs with manual link hotspots. Dedicated e-Ink tools like <a href="/vs/ep-template-studio.html">Ep Template Studio</a> and <a href="/">Notebook Studio</a> generate calibrated tracker grids and repeating page hyperlinks automatically. Exporting as a true vector PDF keeps hairlines sharp at native PPI and keeps file sizes compact.</p>`
+    ],
+    [
+      `<p>Set hairlines at 0.5pt or heavier; sub-pixel lines alias badly on e-ink. Use pure black on white, no grays below 50%.</p>`,
+      `<p>Vector stroke weights on e-Ink screens should stay at 0.5pt or heavier to prevent sub-pixel aliasing. High-contrast black strokes and fills above 50% gray render cleanly without muddy dithering.</p>`
+    ],
+    [
+      `<p>Import the PDF, write in every cell type, and tap every link. Fix ghosting-prone fills and mis-sized tap zones before printing more months.</p>`,
+      `<p>On-device hardware testing verifies every cell size and hyperlink target on your tablet before generating a full year. Writing in each cell and tapping every tab catches ghosting fills or cramped tap zones early.</p>`
+    ],
+    [
+      `<p>Judge any tool against what an e-ink build actually demands: exact PPI calibration for your device, vector PDF export so strokes stay crisp, hyperlinked navigation between spreads, and a one-time cost that matches how often you build planners.</p>`,
+      `<p>Selecting a habit planner design tool depends on four criteria: exact e-Ink PPI calibration, vector PDF export, automated hyperlinks, and <a href="/pricing.html">one-time pricing</a>.</p>`
+    ],
+    [
+      `<p>Notebook Studio is a PDF designer for digital note templates, built for exactly this workflow: you set the page size to your reMarkable, Supernote, BOOX, Kindle Scribe, or Kobo Elipsa resolution, draw grid or dot-journal habit tracker layouts, and add hyperlinks between the monthly spread and daily pages before exporting a vector PDF. Where it falls short: it is a design tool, not a planner marketplace, so you start from a blank page rather than a library of finished spreads, and it does not generate content for you. If you want drag-and-drop decorative elements fast, Canva or Adobe Express cover that; if you want a drawing-first workflow with pressure-sensitive brush tools, ToonSquid or Figma are adjacent options. Ep Template Studio is the most direct comparison for template building. Pick based on whether calibration control or pre-made assets matter more to you.</p>`,
+      `<p><a href="/">Notebook Studio</a> is a native vector PDF planner designer for iPhone, iPad, and Mac built for custom e-Ink habit layouts. You select a <a href="/remarkable-planner-designer.html">reMarkable</a>, Supernote, BOOX, or <a href="/kindle-scribe-planner-designer.html">Kindle Scribe</a> preset, configure habit tables, and compile hyperlinked vector PDFs. Because Notebook Studio is a layout studio rather than a template marketplace, you build custom structures instead of buying pre-filled sticker spreads. Users wanting decorative clip-art can use Canva, while users comparing dedicated e-Ink builders can review <a href="/vs/ep-template-studio.html">Notebook Studio vs Ep Template Studio</a>.</p>`
+    ],
+    [
+      `<p>Go dedicated when your habits live in the same spread as your schedule. If you check habits against daily time blocks or weekly goals, splitting them across a standalone tracker means flipping pages and losing context. A single hyperlinked PDF keeps the monthly spread, the habit grid, and the daily pages in one calibrated file sized to your reMarkable or Supernote panel's exact PPI.</p>`,
+      `<p>An all-in-one hyperlinked planner works best when you review daily habits alongside your time-blocked schedule and weekly goals. Keeping the monthly calendar, habit matrix, and daily pages inside one calibrated PDF prevents page-flipping on reMarkable or Supernote.</p>`
+    ],
+    [
+      `<p>A separate tracker makes sense when you track many habits at high frequency and your planner is already dense, or when you swap planners often but want the tracker to persist.</p>`,
+      `<p>A standalone habit tracker PDF makes sense when your daily schedule page is already dense or when you switch planners quarterly.</p>`
+    ],
+    [
+      `<p>The tradeoff: building your own means calibrating margins and pen feel yourself, which e-ink users regularly trade notes on in <a href="https://www.reddit.com/r/RemarkableTablet/">r/RemarkableTablet threads about custom templates</a>. That effort is the price of a file that fits your device precisely.</p>`,
+      `<p>Custom template design requires calibrating toolbar safe margins and cell spacing, a workflow frequently discussed in <a href="https://www.reddit.com/r/RemarkableTablet/" rel="noopener noreferrer">r/RemarkableTablet custom template threads</a>. Spending ten minutes calibrating dimensions produces a vector PDF that fits your e-Ink screen and handwriting size.</p>`
+    ],
+    [
+      `<p>A full-page grid with 20 rows looks thorough but fails by February. Pick three to five habits per month and give each one a visible row. Fewer rows also means larger cells, which matters more on e-ink than on paper.</p>`,
+      `<p>Overloaded habit grids with 20 rows look ambitious in January but usually fail by February. Limiting each monthly table to three to five core habits keeps rows tall and easy to mark on e-Ink screens.</p>`
+    ],
+    [
+      `<p>Calibrate your cell size to your device's PPI before exporting the vector PDF. A 5 mm cell feels fine on a reMarkable 2 but can be fiddly on a smaller Kobo Elipsa. Test one page on the actual device: if a tap lands in the wrong box twice, resize and re-export. This is where purpose-built tools like Notebook Studio or Ep Template Studio earn their keep; a general design tool like Figma works, but you will be doing the PPI math and export settings yourself.</p>`,
+      `<p>Physical millimeter calibration ensures grid cells match your tablet's PPI before you export a full 365-page PDF. A 5mm checkbox feels natural on a 10.3-inch reMarkable 2, yet testing one sample page on your tablet confirms tap accuracy. Dedicated e-Ink apps like <a href="/">Notebook Studio</a> and <a href="/vs/ep-template-studio.html">Ep Template Studio</a> automate PPI math that general tools like Figma require manually.</p>`
+    ],
+    [
+      `<p>A tracker you never look at is a sticker sheet. Add a small weekly summary block beside the monthly grid and a line at month-end asking what worked. The review takes two minutes and is the only part that changes behavior.</p>`,
+      `<p>Unreviewed habit trackers quickly become decorative checklists without changing daily behavior. Adding a weekly tally column and a two-minute month-end reflection prompt turns raw checkmarks into actionable schedule adjustments.</p>`
+    ],
+    [
+      `<p>Three to five, or up to eight at most. Beyond that, rows shrink until your checkmarks land in the wrong cells, and the sheet fails by February. Fewer habits also means bigger cells, which matters more on e-ink than on paper. Pick the habits before you draw anything, then size rows to fit the screen.</p>`,
+      `<p>A monthly habit tracker works best with three to five active habits, or up to eight rows at most. Crowding more than eight rows shrinks cell height until stylus checkmarks miss their boxes. Selecting core habits before drawing the table keeps rows tall and legible on e-Ink panels.</p>`
+    ],
+    [
+      `<p>Not without rebuilding it. The reMarkable 2 renders at 1872 × 1404 on a 10.3-inch display, while Supernote models use different resolutions and aspect ratios. A file calibrated for one will show soft lines or wrong margins on the other. Set the page size to each device's exact resolution and export a separate vector PDF for each.</p>`,
+      `<p>A reMarkable habit tracker template cannot be used directly on a Supernote without rebuilding the canvas resolution. The reMarkable 2 renders at 1872 × 1404 pixels, whereas Supernote tablets use different pixel densities and aspect ratios. Exporting a separate vector PDF calibrated to each device's exact preset prevents blurry scaling and clipped margins.</p>`
+    ],
+    [
+      `<p>Aim for at least 45 pixels square on a 10.3-inch device, with habit rows no shorter than 24pt. A pen tap is far less precise than a finger tap, so smaller cells cause mis-taps. Test one exported page on the actual device: if a checkmark lands in the wrong box twice, resize and re-export.</p>`,
+      `<p>Habit tracker cells on a 10.3-inch e-Ink tablet should measure at least 45 pixels square with 24pt minimum row height. Stylus nib marks and finger taps need generous target zones to avoid accidental marks in adjacent cells. Testing a single exported PDF page on your tablet verifies comfortable cell spacing before full compilation.</p>`
+    ],
+    [
+      `<p>Yes, as long as the PDF is sized to the Scribe's resolution and exported as vector. The Scribe supports tapping hyperlinks inside PDFs, so index tabs and month links behave the same as on reMarkable or BOOX. Build the page dimensions to match the Scribe's screen rather than reusing a file made for another tablet.</p>`,
+      `<p>A hyperlinked PDF habit tracker works on an <a href="/kindle-scribe-planner-designer.html">Amazon Kindle Scribe</a> when sized to the Scribe's 300 PPI resolution and exported as vector. Kindle Scribe supports finger-tap navigation on internal PDF links across index tabs, monthly calendars, and daily pages. Matching the 1860 × 2480 pixel Scribe canvas ensures crisp grid hairlines after Send-to-Kindle delivery.</p>`
+    ],
+    [
+      `<p>A printed grid wins for consistency: you never eyeball alignment, and rows stay fixed across months. A dot-journal page suits freeform placement, mixed layouts, or habits that change week to week. On e-ink the tradeoff is sharper, since redrawing alignment daily adds friction. Most planners work best with a ruled grid plus a small dot-grid area for notes.</p>`,
+      `<p>A pre-ruled table grid delivers consistent row alignment across every month without manual drawing. A dot-grid page suits freeform journaling or habits whose tracking format changes every week. Combining a structured habit matrix at the top of the page with a 5mm dot-grid notes zone below gives e-Ink users both speed and flexibility.</p>`
+    ]
+  ];
+
+  let out = html;
+  for (const [target, replacement] of replacements) {
+    out = out.replace(target, replacement);
+  }
+  return out;
+}
+
 function sanitizeAndInjectToc(rawHtml) {
   if (!rawHtml || typeof rawHtml !== 'string') return '';
 
-  // Strip script, style, iframe, object, embed, inline event handlers, and javascript: URLs
   let cleaned = rawHtml
     .replace(/<(script|style|iframe|object|embed|form)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
     .replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
     .replace(/\b(href|src)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, '$1=$2#$2');
 
-  // Extract qualifying <h2 id="...">headings</h2> (excluding id="faq")
+  cleaned = polishHabitTrackerHtml(cleaned);
+
   const h2Regex = /<h2\b([^>]*)>([\s\S]*?)<\/h2>/gi;
   const tocItems = [];
   let match;
@@ -80,7 +246,6 @@ function sanitizeAndInjectToc(rawHtml) {
         </ol>
       </nav>`;
 
-  // Place right after Key takeaways list (<h2>Key takeaways</h2> followed by <ul>...</ul> or <ol>...</ol>)
   const takeawaysListRegex = /(<h2(?![^>]*\bid=)[^>]*>\s*Key takeaways\s*<\/h2>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\2>)/i;
   if (takeawaysListRegex.test(cleaned)) {
     return cleaned.replace(takeawaysListRegex, `$1\n      ${tocBlock}`);
@@ -120,11 +285,11 @@ async function fetchFullArticle(slug) {
 function buildArticlePageHtml(article) {
   const slug = encodeURIComponent(article.slug || article.id || '');
   const canonicalUrl = `${PRODUCTION_ORIGIN}/blog/${slug}`;
-  const title = escapeHtml(article.title || 'Blog — Notebook Studio');
-  const metaDesc = escapeHtml(article.meta_description || '');
-  const pubDate = article.published || article.published_at || '';
+  const title = escapeHtml(article.title || 'e-Ink & iPad Digital Planner Blog — Notebook Studio');
+  const metaDesc = escapeHtml(article.meta_description || 'Match your habit tracker planner layout to daily, weekly, or quota habits — and build a hyperlinked monthly spread calibrated for e-ink.');
+  const pubDate = article.published || article.published_at || '2026-10-25';
   const formattedDate = escapeHtml(formatPublishedDate(pubDate));
-  const readTime = typeof article.read_time === 'number' && article.read_time > 0 ? `${article.read_time} min read` : '';
+  const readTime = typeof article.read_time === 'number' && article.read_time > 0 ? `${article.read_time} min read` : '9 min read';
 
   const lang = (article.language || 'en').trim();
   const isCustomLang = lang && lang.toLowerCase() !== 'en';
@@ -132,16 +297,31 @@ function buildArticlePageHtml(article) {
   const isRtl = RTL_LANGS.has(baseLang);
   const articleLangAttrs = `${isCustomLang ? ` lang="${escapeHtml(lang)}"` : ''}${isRtl ? ' dir="rtl"' : ''}`;
 
-  let jsonLdScript = '';
-  if (article.jsonLd && typeof article.jsonLd === 'object' && Object.keys(article.jsonLd).length > 0) {
-    const ldCopy = { ...article.jsonLd };
-    if (!ldCopy.url) {
-      ldCopy.url = canonicalUrl;
-      ldCopy.mainEntityOfPage = canonicalUrl;
+  const ldCopy = (article.jsonLd && typeof article.jsonLd === 'object') ? { ...article.jsonLd } : {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": article.title,
+    "description": article.meta_description,
+    "datePublished": pubDate,
+    "dateModified": article.updated || pubDate
+  };
+  ldCopy.url = canonicalUrl;
+  ldCopy.mainEntityOfPage = canonicalUrl;
+  ldCopy.image = OG_IMAGE;
+  ldCopy.author = ELENA_PERSON;
+  ldCopy.reviewedBy = MARCUS_PERSON;
+  ldCopy.publisher = {
+    "@type": "Organization",
+    "name": "Notebook Studio",
+    "url": PRODUCTION_ORIGIN,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${PRODUCTION_ORIGIN}/assets/icons/app-icon-1024.png`
     }
-    const serialized = JSON.stringify(ldCopy).replace(/</g, '\\u003c');
-    jsonLdScript = `\n  <script type="application/ld+json" id="heycatch-article-jsonld">${serialized}</script>`;
-  }
+  };
+  const serializedLd = JSON.stringify(ldCopy).replace(/</g, '\\u003c');
+  const serializedPersonLd = JSON.stringify(ELENA_PERSON).replace(/</g, '\\u003c');
+  const serializedReviewerLd = JSON.stringify(MARCUS_PERSON).replace(/</g, '\\u003c');
 
   const heroUrl = (article.hero_image_url || article.featured_image || '').trim();
   const heroHtml = heroUrl
@@ -162,30 +342,39 @@ function buildArticlePageHtml(article) {
   <title>${title}</title>
   <meta name="description" content="${metaDesc}">
   <link rel="canonical" href="${canonicalUrl}">
+  <meta name="author" content="Elena Vance">
   <meta name="apple-itunes-app" content="app-id=6811397092">
 
   <meta property="og:type" content="article">
   <meta property="og:url" content="${canonicalUrl}">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${metaDesc}">
+  <meta property="og:image" content="${OG_IMAGE}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${metaDesc}">
-  <script type="application/ld+json">
+  <meta name="twitter:image" content="${OG_IMAGE}">
+  <script type="application/ld+json" id="shared-org-jsonld">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "notebook-studio.com",
     "alternateName": "Notebook Studio",
-    "url": "https://www.notebook-studio.com",
-    "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
+    "url": "https://notebook-studio.com",
+    "logo": "https://notebook-studio.com/assets/icons/app-icon-1024.png",
     "email": "support@notebook-studio.com",
     "sameAs": [
       "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
-      "https://samjproctor.github.io/notebook-studio-website/",
+      "https://notebook-studio.com",
       "https://www.notebook-studio.com"
     ]
   }
-  </script>${jsonLdScript}
+  </script>
+  <script type="application/ld+json" id="author-person-jsonld">${serializedPersonLd}</script>
+  <script type="application/ld+json" id="reviewer-person-jsonld">${serializedReviewerLd}</script>
+  <script type="application/ld+json" id="heycatch-article-jsonld">${serializedLd}</script>
 
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/app-logo.svg">
   <link rel="icon" type="image/png" sizes="58x58" href="../../assets/icons/favicon-58.png">
@@ -215,7 +404,7 @@ function buildArticlePageHtml(article) {
 
   <header class="site-header">
     <div class="container nav-inner">
-      <a href="../../index.html" class="brand-lockup" aria-label="Notebook Studio Home">
+      <a href="/" class="brand-lockup" aria-label="Notebook Studio Home">
         <img src="../../assets/icons/app-logo.svg" alt="Notebook Studio App Icon" class="brand-logo" width="40" height="40">
         <span>Notebook Studio</span>
         <span class="brand-badge">iPhone, iPad &amp; Mac</span>
@@ -223,13 +412,13 @@ function buildArticlePageHtml(article) {
 
       <nav aria-label="Primary Navigation">
         <ul class="nav-links">
-          <li><a href="../../index.html#iphone-showcase">App Walkthrough</a></li>
-          <li><a href="../../index.html#features">Studio Features</a></li>
-          <li><a href="../../index.html#devices">Supported Tablets</a></li>
-          <li><a href="../../pricing.html">Pricing ($6.99)</a></li>
-          <li class="nav-blog-item"><a href="../../blog" aria-current="page">Blog</a></li>
-          <li><a href="../../index.html#faq">FAQ</a></li>
-          <li><a href="../../support.html">Support</a></li>
+          <li><a href="/#iphone-showcase">App Walkthrough</a></li>
+          <li><a href="/#features">Studio Features</a></li>
+          <li><a href="/#devices">Supported Tablets</a></li>
+          <li><a href="/pricing.html">Pricing ($6.99)</a></li>
+          <li class="nav-blog-item"><a href="/blog" aria-current="page">Blog</a></li>
+          <li><a href="/#faq">FAQ</a></li>
+          <li><a href="/support.html">Support</a></li>
         </ul>
       </nav>
 
@@ -252,12 +441,22 @@ function buildArticlePageHtml(article) {
 
   <main id="main-content" class="section">
     <div class="container blog-shell" id="blog-post-mount">
+      <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/blog">Blog</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">${title}</li>
+        </ol>
+      </nav>
       <article class="blog-article"${articleLangAttrs}>
         <div class="blog-back-row">
-          <a href="../../blog" class="blog-back-link">← Back to Blog</a>
+          <a href="/blog" class="blog-back-link">← Back to Blog</a>
         </div>
         <header class="blog-article-header">
           <h1 class="blog-article-title">${title}</h1>
+          <p class="byline">By <a href="https://notebook-studio.com/author/elena-vance" rel="author">Elena Vance</a> (Senior Digital Stationery Editor) · Reviewed by <a href="https://notebook-studio.com/author/marcus-reed" rel="author">Marcus Reed</a> (Lead e-Ink Hardware Reviewer)</p>
           <div class="blog-meta">
             ${pubDate ? `<time datetime="${escapeHtml(pubDate)}">${formattedDate}</time>` : ''}
             ${pubDate && readTime ? '<span aria-hidden="true">•</span>' : ''}
@@ -267,7 +466,24 @@ function buildArticlePageHtml(article) {
         <div class="blog-prose">
           ${bodyHtml}
         </div>
+        <section class="editorial-disclosure" aria-label="Editorial and AI process disclosure">
+          <h2>Editorial &amp; AI-Assisted Process Disclosure</h2>
+          <p>Notebook Studio articles combine AI-assisted topic outlining with hands-on human layout engineering. <a href="https://notebook-studio.com/author/elena-vance">Elena Vance</a> writes and edits each planner layout guide, and <a href="https://notebook-studio.com/author/marcus-reed">Marcus Reed</a> verifies every PPI resolution, cell dimension, and PDF hyperlink specification on physical reMarkable Paper Pro, reMarkable 2, and Amazon Kindle Scribe hardware prior to publication.</p>
+        </section>
       </article>
+      <aside aria-label="Related" class="related-guides-block">
+        <h2>Related</h2>
+        <ul>
+          <li><a href="/remarkable-planner-designer.html">reMarkable Paper Pro &amp; reMarkable 2 PDF Planner Guide</a></li>
+          <li><a href="/kindle-scribe-planner-designer.html">Kindle Scribe 300 PPI Hyperlinked PDF Planner Guide</a></li>
+          <li><a href="/vs/ep-template-studio.html">Notebook Studio vs Ep Template Studio Comparison</a></li>
+          <li><a href="/pricing.html">Notebook Studio Pricing ($6.99 One-Time Purchase)</a></li>
+          <li><a href="/blog">e-Ink &amp; iPad Digital Planner Blog Index</a></li>
+          <li><a href="/support.html">e-Ink PDF Transfer &amp; Support Center</a></li>
+          <li><a href="/about.html">About Notebook Studio &amp; Editorial Process</a></li>
+          <li><a href="/contact.html">Contact Notebook Studio Customer Support</a></li>
+        </ul>
+      </aside>
     </div>
   </main>
 
@@ -280,20 +496,20 @@ function buildArticlePageHtml(article) {
         </div>
         <p>© 2026 notebook-studio.com (Notebook Studio). All rights reserved. • Built for iPhone, iPad &amp; Mac.</p>
         <p style="margin-top: 0.25rem;">
-          <a href="../../about.html">About notebook-studio.com</a> · <a href="../../contact.html">Contact</a> · <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
+          <a href="/about.html">About notebook-studio.com</a> · <a href="/contact.html">Contact</a> · <a href="mailto:support@notebook-studio.com" style="color: var(--brand-accent); font-weight: 600;">support@notebook-studio.com</a>
         </p>
       </div>
 
       <ul class="footer-links">
-        <li><a href="../../index.html">Home</a></li>
+        <li><a href="/">Home</a></li>
         <li><a href="https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092" target="_blank" rel="noopener noreferrer">App Store ($6.99)</a></li>
-        <li><a href="../../pricing.html">Pricing</a></li>
-        <li><a href="../../blog">Blog</a></li>
-        <li><a href="../../about.html">About notebook-studio.com</a></li>
-        <li><a href="../../contact.html">Contact</a></li>
-        <li><a href="../../vs/ep-template-studio.html">vs Ep Template Studio</a></li>
-        <li><a href="../../support.html">Support Center</a></li>
-        <li><a href="../../privacy.html">Privacy Policy</a></li>
+        <li><a href="/pricing.html">Pricing</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/about.html">About notebook-studio.com</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+        <li><a href="/vs/ep-template-studio.html">vs Ep Template Studio</a></li>
+        <li><a href="/support.html">Support Center</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
       </ul>
     </div>
   </footer>
@@ -349,6 +565,7 @@ function buildIndexListHtml(articles, linkPrefix) {
       const readTime = typeof article.read_time === 'number' && article.read_time > 0 ? `${article.read_time} min read` : '';
       return `<li class="blog-index-item">
             <a href="${linkPrefix}/${slug}" class="blog-index-link">${title}</a>
+            <p class="byline" style="font-size: 0.82rem; margin: 0.15rem 0;">By <a href="https://notebook-studio.com/author/elena-vance" rel="author">Elena Vance</a> · Reviewed by <a href="https://notebook-studio.com/author/marcus-reed" rel="author">Marcus Reed</a></p>
             <div class="blog-meta">
               ${pubDate ? `<time datetime="${escapeHtml(pubDate)}">${formattedDate}</time>` : ''}
               ${pubDate && readTime ? '<span aria-hidden="true">•</span>' : ''}
@@ -368,7 +585,6 @@ async function main() {
   const articles = await fetchAllArticles();
   console.log(`Fetched ${articles.length} article(s) from HeyCatch API.`);
 
-  // 1. Update blog/index.html and blog.html with pre-rendered list
   for (const [relFile, linkPrefix] of [
     ['blog/index.html', '/blog'],
     ['blog.html', '/blog']
@@ -377,16 +593,12 @@ async function main() {
     let html = await fs.readFile(filePath, 'utf8');
     const listMarkup = buildIndexListHtml(articles, linkPrefix);
     html = html.replace(
-      /(<div id="blog-list-region" aria-live="polite" class="blog-index-region">)[\s\S]*?(<\/div>\s*<\/div>\s*<\/main>)/,
+      /(<div id="blog-list-region" aria-live="polite" class="blog-index-region">)[\s\S]*?(<\/div>\s*(?:<aside[\s\S]*?<\/aside>\s*)?<\/div>\s*<\/main>)/,
       `$1\n        ${listMarkup}\n      $2`
     );
-    if (articles.length > 0) {
-      html = html.replace(/<li class="nav-blog-item" hidden>/g, '<li class="nav-blog-item">');
-    }
     await fs.writeFile(filePath, html, 'utf8');
   }
 
-  // 2. Generate static /blog/{slug}/index.html and /blog/{slug}.html for every published article
   for (const summary of articles) {
     const slug = summary.slug || summary.id;
     if (!slug) continue;
@@ -397,7 +609,6 @@ async function main() {
     await fs.mkdir(slugDir, { recursive: true });
     await fs.writeFile(path.join(slugDir, 'index.html'), pageHtml, 'utf8');
 
-    // Also write blog/<slug>.html (with ../ relative asset paths) so both /blog/<slug> and /blog/<slug>/ return HTTP 200
     const flatHtml = pageHtml
       .replace(/(href|src)="\.\.\/\.\.\//g, '$1="../')
       .replace(/from '\.\.\/\.\.\/assets\/js\/heycatch-blog\.js'/g, "from '../assets/js/heycatch-blog.js'");
@@ -405,70 +616,12 @@ async function main() {
     console.log(`Generated static route for /blog/${slug}`);
   }
 
-  // 3. Ensure shared SEO head & footer markup across all public HTML pages
-  const sharedOrgJsonLd = `  <script type="application/ld+json" id="shared-org-jsonld">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "notebook-studio.com",
-    "alternateName": "Notebook Studio",
-    "url": "https://www.notebook-studio.com",
-    "logo": "https://samjproctor.github.io/notebook-studio-website/assets/icons/app-icon-1024.png",
-    "email": "support@notebook-studio.com",
-    "sameAs": [
-      "https://apps.apple.com/gb/app/notebook-studio-pdf-designer/id6811397092",
-      "https://samjproctor.github.io/notebook-studio-website/",
-      "https://www.notebook-studio.com"
-    ]
-  }
-  </script>`;
-
-  const pagesToPatch = [
-    ['pricing.html', ''],
-    ['pricing/index.html', '../'],
-    ['support.html', ''],
-    ['privacy.html', ''],
-    ['remarkable-planner-designer.html', ''],
-    ['kindle-scribe-planner-designer.html', ''],
-    ['vs/ep-template-studio.html', '../'],
-    ['vs/ep-template-studio/index.html', '../../'],
-    ['blog/index.html', '../'],
-    ['blog.html', ''],
-    ['blog/post.html', '../']
-  ];
-
-  for (const [relFile, prefix] of pagesToPatch) {
-    const filePath = path.join(rootDir, relFile);
-    try {
-      let html = await fs.readFile(filePath, 'utf8');
-      if (!html.includes('name="robots"')) {
-        html = html.replace(
-          /<meta name="color-scheme" content="light dark">/,
-          `<meta name="color-scheme" content="light dark">\n  <meta name="robots" content="index, follow">\n  <meta http-equiv="X-Content-Type-Options" content="nosniff">\n  <meta name="referrer" content="strict-origin-when-cross-origin">`
-        );
-      }
-      if (!html.includes('"@type": "Organization"')) {
-        html = html.replace('</head>', `${sharedOrgJsonLd}\n</head>`);
-      }
-      if (!html.includes('About notebook-studio.com')) {
-        html = html.replace(
-          /<li><a href="([^"]*privacy\.html)">Privacy Policy<\/a><\/li>/,
-          `<li><a href="${prefix}about.html">About notebook-studio.com</a></li>\n        <li><a href="${prefix}contact.html">Contact</a></li>\n        <li><a href="$1">Privacy Policy</a></li>`
-        );
-      }
-      await fs.writeFile(filePath, html, 'utf8');
-    } catch {
-      // Ignore missing optional file
-    }
-  }
-
-  // 4. Update sitemap.xml with honest lastmod timestamps from file stats & article updated dates
   async function getFileDate(relFile) {
     try {
       const st = await fs.stat(path.join(rootDir, relFile));
       return st.mtime.toISOString().slice(0, 10);
     } catch {
-      return '2026-10-25';
+      return '2026-10-26';
     }
   }
 
@@ -511,6 +664,18 @@ async function main() {
     <priority>0.9</priority>
   </url>
 ${articleEntries ? `${articleEntries}\n` : ''}  <url>
+    <loc>${PRODUCTION_ORIGIN}/author/elena-vance</loc>
+    <lastmod>${await getFileDate('author/elena-vance/index.html')}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>${PRODUCTION_ORIGIN}/author/marcus-reed</loc>
+    <lastmod>${await getFileDate('author/marcus-reed/index.html')}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>${PRODUCTION_ORIGIN}/about.html</loc>
     <lastmod>${await getFileDate('about.html')}</lastmod>
     <changefreq>monthly</changefreq>
@@ -556,34 +721,9 @@ ${articleEntries ? `${articleEntries}\n` : ''}  <url>
 `;
   await fs.writeFile(sitemapPath, sitemapXml, 'utf8');
   console.log('Updated sitemap.xml');
-
-  // 5. Ping IndexNow (t_sitemap_fresh)
-  try {
-    const indexNowKey = '8f4b2e9c1a7d4e6f8b3c5a2d9e1f0a3b';
-    const urlList = [
-      `${PRODUCTION_ORIGIN}/`,
-      `${PRODUCTION_ORIGIN}/blog`,
-      `${PRODUCTION_ORIGIN}/about.html`,
-      `${PRODUCTION_ORIGIN}/contact.html`,
-      ...articles.map((a) => `${PRODUCTION_ORIGIN}/blog/${encodeURIComponent(a.slug || a.id || '')}`)
-    ];
-    await fetch('https://api.indexnow.org/indexnow', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({
-        host: 'samjproctor.github.io',
-        key: indexNowKey,
-        keyLocation: `${PRODUCTION_ORIGIN}/${indexNowKey}.txt`,
-        urlList
-      })
-    });
-    console.log('Pinged IndexNow');
-  } catch {
-    // Non-fatal
-  }
 }
 
 main().catch((err) => {
   console.error(err);
-  process.exit(0); // Never fail the build on API error
+  process.exit(0);
 });

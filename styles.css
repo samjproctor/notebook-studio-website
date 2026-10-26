@@ -1794,3 +1794,121 @@ dialog.lightbox-dialog::backdrop {
   text-align: center;
   box-shadow: var(--shadow-card);
 }
+
+/* ==========================================================================
+   SEO Audit Additions: Author Bylines, Editorial Disclosure, Breadcrumbs,
+   Related Block & Author Profile Cards
+   ========================================================================== */
+
+.byline {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0.35rem 0 0.65rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.byline a {
+  color: var(--brand-accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.editorial-disclosure {
+  margin-top: 2.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-strong);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.editorial-disclosure h2 {
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  margin: 0 0 0.5rem 0 !important;
+  color: var(--text-primary);
+}
+
+.editorial-disclosure p {
+  margin: 0 !important;
+}
+
+.breadcrumb-nav {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumb-nav ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.breadcrumb-nav a {
+  color: var(--brand-accent);
+  text-decoration: none;
+}
+
+.breadcrumb-nav a:hover {
+  text-decoration: underline;
+}
+
+.related-guides-block {
+  margin-top: 2.75rem;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.related-guides-block h2 {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  margin: 0 0 0.85rem 0 !important;
+  color: var(--text-primary);
+}
+
+.related-guides-block ul {
+  list-style: none;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.related-guides-block li {
+  margin: 0 !important;
+}
+
+.related-guides-block a {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.related-guides-block a:hover {
+  border-color: var(--brand-accent);
+  color: var(--brand-accent);
+}
+
